@@ -1,6 +1,7 @@
 rootProject.name = "planarplugins"
 
 val plugins = listOf(
+  "FortuneShears",
 )
 
 for (plugin in plugins) {
