@@ -1,6 +1,7 @@
 rootProject.name = "planarplugins"
 
 val plugins = listOf(
+  "ColorSignText",
 )
 
 for (plugin in plugins) {
