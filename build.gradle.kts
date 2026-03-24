@@ -25,6 +25,10 @@ subprojects {
     compileOnly(rootProject.libs.paper.api)
   }
 
+  java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+  }
+
   tasks.withType<JavaCompile>().configureEach {
     options.release = 21
     options.encoding = Charsets.UTF_8.name()
@@ -34,13 +38,11 @@ subprojects {
     options.encoding = Charsets.UTF_8.name()
   }
 
-  val projectName = name;
-
   tasks.withType<ProcessResources>().configureEach {
     filteringCharset = Charsets.UTF_8.name()
 
     expand(
-      "name" to projectName,
+      "name" to project.name,
       "version" to version,
       "paper" to (rootProject.libs.paper.api.get().version ?: "1.21.11")
     )
@@ -48,6 +50,29 @@ subprojects {
 
   tasks.withType<Jar>().configureEach {
     manifest.attributes("paperweight-mappings-namespace" to "mojang")
+  }
+
+  tasks.register<Delete>("removePreviousDistribution") {
+    delete(rootProject.layout.projectDirectory.dir("dist").files("${project.name}-.*\\.jar"))
+  }
+
+  tasks.register<Copy>("distribute") {
+    dependsOn("removePreviousDistribution")
+
+    var shadow: Task? = tasks.findByName("shadowJar")
+    if (shadow != null && shadow is Jar) {
+      from(shadow)
+    } else {
+      from(tasks.jar)
+    }
+
+    into(rootProject.layout.projectDirectory.dir("dist").toString())
+    // Strip off classifiers
+    rename("(-[A-Za-z]+)*\\.jar$", ".jar")
+  }
+
+  tasks.build {
+    dependsOn("distribute")
   }
 
 }
