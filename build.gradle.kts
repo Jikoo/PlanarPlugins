@@ -1,6 +1,7 @@
 plugins {
   `java-library`
   alias(libs.plugins.shadow) apply false
+  alias(libs.plugins.errorprone.gradle)
 }
 
 repositories {
@@ -12,6 +13,7 @@ java.disableAutoTargetJvm()
 
 subprojects {
   apply(plugin = "java-library")
+  apply(plugin = "net.ltgt.errorprone")
 
   repositories {
     mavenCentral()
@@ -23,6 +25,8 @@ subprojects {
     compileOnly(rootProject.libs.jspecify)
     compileOnly(rootProject.libs.jetbrains.annotations)
     compileOnly(rootProject.libs.paper.api)
+
+    errorprone(rootProject.libs.errorprone.core)
   }
 
   java {
