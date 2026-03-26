@@ -77,8 +77,6 @@ subprojects {
     }
 
     into(rootProject.layout.projectDirectory.dir("dist").toString())
-    // Strip off classifiers
-    rename("(-[A-Za-z]+)*\\.jar$", ".jar")
   }
 
   tasks.build {
