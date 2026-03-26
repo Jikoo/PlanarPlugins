@@ -4,6 +4,7 @@ val plugins = listOf(
   "ColorSignText",
   "FortuneShears",
   "FreeCart",
+  "WitherFacts",
 )
 
 for (plugin in plugins) {
