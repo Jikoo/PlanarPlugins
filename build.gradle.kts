@@ -63,7 +63,9 @@ subprojects {
   }
 
   tasks.register<Delete>("removePreviousDistribution") {
-    delete(rootProject.layout.projectDirectory.dir("dist").files("${project.name}-.*\\.jar"))
+    delete(rootProject.layout.projectDirectory.dir("dist").asFileTree.matching {
+      include("${project.name}-*.jar")
+    })
   }
 
   tasks.register<Copy>("distribute") {
