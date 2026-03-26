@@ -10,12 +10,8 @@ import com.github.jikoo.planarenchanting.anvil.WorkPiece;
 import com.github.jikoo.planarenchanting.table.Enchantability;
 import com.github.jikoo.planarenchanting.table.EnchantingTable;
 import com.github.jikoo.planarenchanting.table.TableEnchantListener;
-
+import com.google.errorprone.annotations.Keep;
 import io.papermc.paper.event.block.PlayerShearBlockEvent;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -31,15 +27,18 @@ import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
 @NullMarked
 public class FortuneShears extends JavaPlugin implements Listener {
-  
-  // Silk touch because heck you. Also lower enchantability for the same reason.
+
   private final Set<Enchantment> enchants = Set.of(Enchantment.UNBREAKING, Enchantment.EFFICIENCY, Enchantment.FORTUNE, Enchantment.SILK_TOUCH);
   private final EnchantingTable table = new EnchantingTable(enchants, new Enchantability(14));
   private final Anvil anvil = new Anvil() {
 
-    private AnvilBehavior<ItemStack> behavior = new ComponentVanillaBehavior() {
+    private final AnvilBehavior<ItemStack> behavior = new ComponentVanillaBehavior() {
         @Override
         public boolean enchantApplies(Enchantment enchantment, ItemStack base) {
           return enchants.contains(enchantment);
@@ -53,7 +52,7 @@ public class FortuneShears extends JavaPlugin implements Listener {
       AnvilInventory anvilInv = view.getTopInventory();
       ItemStack base = anvilInv.getItem(0);
 
-      if (base.getAmount() != 1) {
+      if (base == null || base.getAmount() != 1) {
         return AnvilResult.EMPTY;
       }
 
@@ -92,7 +91,8 @@ public class FortuneShears extends JavaPlugin implements Listener {
   }
 
   @EventHandler
-  void onPrepareAnvil(PrepareAnvilEvent event) {
+  @Keep
+  private void onPrepareAnvil(PrepareAnvilEvent event) {
     AnvilView view = event.getView();
     AnvilInventory inventory = view.getTopInventory();
     ItemStack base = inventory.getFirstItem();
@@ -104,7 +104,7 @@ public class FortuneShears extends JavaPlugin implements Listener {
 
     AnvilResult result = anvil.getResult(event.getView());
 
-    if (result == AnvilResult.EMPTY) {
+    if (result.equals(AnvilResult.EMPTY)) {
       return;
     }
 
@@ -136,12 +136,14 @@ public class FortuneShears extends JavaPlugin implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+  @Keep
+  private void onPlayerShearEntity(PlayerShearEntityEvent event) {
     handleShear(new ShearEvent(event));
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onPlayerShearBlock(PlayerShearBlockEvent event) {
+  @Keep
+  private void onPlayerShearBlock(PlayerShearBlockEvent event) {
     handleShear(new ShearEvent(event));
   }
 

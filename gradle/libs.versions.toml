@@ -1,7 +1,7 @@
 [versions]
 paper-api = "1.21.11-R0.1-SNAPSHOT"
 planarwrappers = "4.0.0"
-planarenchanting = "3.0.1"
+planarenchanting = "3.0.3"
 jspecify = "1.0.0"
 jetbrains-annotations = "26.1.0"
 errorprone-core = "2.46.0"
