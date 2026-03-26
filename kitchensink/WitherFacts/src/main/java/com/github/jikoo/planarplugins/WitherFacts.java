@@ -14,20 +14,24 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class WitherFacts extends JavaPlugin implements Listener {
 
-  private final ItemStack facts;
+  private @UnknownNullability ItemStack facts;
 
-  public WitherFacts() {
+  @Override
+  public void onEnable() {
     this.facts = new ItemStack(Material.WRITTEN_BOOK);
     facts.editMeta(BookMeta.class, book -> {
       book.author(Component.text("Pete").color(NamedTextColor.BLUE));
       book.title(Component.text("Wither Facts"));
       book.addPages(Component.text("Withers are awesome."));
     });
+
+    getServer().getPluginManager().registerEvents(this, this);
   }
 
   @EventHandler(ignoreCancelled = true)
