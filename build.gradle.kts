@@ -45,10 +45,16 @@ subprojects {
   tasks.withType<ProcessResources>().configureEach {
     filteringCharset = Charsets.UTF_8.name()
 
+    var apiVersion = rootProject.libs.paper.api.get().version!!
+    var end = apiVersion.indexOf('-')
+    if (end >= 0) {
+      apiVersion = apiVersion.substring(0, apiVersion.indexOf('-'))
+    }
+
     expand(
       "name" to project.name,
       "version" to version,
-      "paper" to (rootProject.libs.paper.api.get().version ?: "1.21.11")
+      "apiVersion" to apiVersion,
     )
   }
 
@@ -71,8 +77,6 @@ subprojects {
     }
 
     into(rootProject.layout.projectDirectory.dir("dist").toString())
-    // Strip off classifiers
-    rename("(-[A-Za-z]+)*\\.jar$", ".jar")
   }
 
   tasks.build {

@@ -2,5 +2,5 @@ name: "$name"
 main: "com.github.jikoo.planarplugins.$name"
 author: "Jikoo"
 version: "$version"
-api-version: "$paper"
+api-version: "$apiVersion"
 folia-supported: true
