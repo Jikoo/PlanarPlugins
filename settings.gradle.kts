@@ -3,6 +3,7 @@ rootProject.name = "planarplugins"
 val plugins = listOf(
   "BottleExperience",
   "ColorSignText",
+  "Coords",
   "FortuneShears",
   "FreeCart",
   "WitherFacts",
