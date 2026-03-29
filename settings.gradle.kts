@@ -6,6 +6,7 @@ val plugins = listOf(
   "Coords",
   "FortuneShears",
   "FreeCart",
+  "RepairCostRemover",
   "WitherFacts",
 )
 
