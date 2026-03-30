@@ -1,83 +1,103 @@
 package com.github.jikoo.planarplugins;
 
+import com.github.jikoo.planarplugins.meta.Book;
+import com.github.jikoo.planarplugins.meta.Head;
+import com.github.jikoo.planarplugins.meta.Lore;
+import com.github.jikoo.planarplugins.meta.arguments.DataComponentTypeArgument;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
-
-import java.util.List;
 
 @NullMarked
 public class Meta extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    LiteralCommandNode<CommandSourceStack> command = Commands.literal("meta")
-        .then(Commands.argument("author", StringArgumentType.greedyString()).executes(this::author))
-        .then(Commands.argument("owner", StringArgumentType.word()).executes(this::owner))
+    LiteralCommandNode<CommandSourceStack> lore = Lore.command();
+    CommandNode<CommandSourceStack> book = Book.command();
+    CommandNode<CommandSourceStack> head = Head.command();
+
+    LiteralCommandNode<CommandSourceStack> meta = Commands.literal("meta")
+        .then(lore)
+        .then(book)
+        .then(head)
+        .then(Commands.literal("name")
+            .then(Commands.argument("name", StringArgumentType.greedyString())
+                .executes(this::name)))
+        .then(Commands.literal("reset")
+            .then(Commands.argument("type", new DataComponentTypeArgument())
+                .executes(this::resetSingle))
+            .executes(this::reset))
+        .requires(stack -> stack.getSender().hasPermission("planarplugins.command.meta"))
         .build();
-    // TODO permissions requirement
 
     LifecycleEventManager<Plugin> manager = this.getLifecycleManager();
     manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
       final Commands commands = event.registrar();
-      commands.register(
-          command,
-          "Modify an item's meta",
-          List.of("lore")
-      );
+      commands.register(meta, "Modify an item's meta");
+      commands.register(lore, "Modify an item's lore");
     });
   }
 
-  private int author(CommandContext<CommandSourceStack> context) {
+  private int name(CommandContext<CommandSourceStack> context) {
     if (!(context.getSource().getExecutor() instanceof Player player)) {
       context.getSource().getSender().sendMessage("Target is not a player!");
       return 0;
     }
 
-    String author = context.getArgument("author", String.class);
-    Component authorComponent = MiniMessage.miniMessage().deserialize(author);
+    String name = context.getArgument("name", String.class);
+    Component nameComponent = MiniMessage.miniMessage().deserialize(name);
 
-    if (player.getInventory().getItemInMainHand().editMeta(BookMeta.class, book -> book.author(authorComponent))) {
-      // TODO check if need update item
-      context.getSource().getSender().sendMessage("Author changed!");
+    if (player.getInventory().getItemInMainHand().editMeta(ItemMeta.class, meta -> meta.customName(nameComponent))) {
+      context.getSource().getSender().sendMessage("Name changed!");
       return Command.SINGLE_SUCCESS;
     }
 
-    System.out.println("Item in hand does not have book meta!");
+    context.getSource().getSender().sendMessage("Item in hand does not have meta!");
     return 0;
   }
 
-  private int owner(CommandContext<CommandSourceStack> context) {
+  private int reset(CommandContext<CommandSourceStack> context) {
     if (!(context.getSource().getExecutor() instanceof Player player)) {
       context.getSource().getSender().sendMessage("Target is not a player!");
       return 0;
     }
 
-    String owner = context.getArgument("owner", String.class);
-    OfflinePlayer target = Bukkit.getOfflinePlayer(owner);
+    ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+    ItemMeta meta = getServer().getItemFactory().getItemMeta(itemInMainHand.getType());
+    itemInMainHand.setItemMeta(meta);
 
-    if (player.getInventory().getItemInMainHand().editMeta(SkullMeta.class, skull -> skull.setOwningPlayer(target))) {
-      context.getSource().getSender().sendMessage("Owner changed!");
-      return Command.SINGLE_SUCCESS;
+    context.getSource().getSender().sendMessage("Reset item meta!");
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private int resetSingle(CommandContext<CommandSourceStack> context) {
+    if (!(context.getSource().getExecutor() instanceof Player player)) {
+      context.getSource().getSender().sendMessage("Target is not a player!");
+      return 0;
     }
 
-    context.getSource().getSender().sendMessage("Item in hand does not have skull meta!");
-    return 0;
+    DataComponentType component = context.getArgument("type", DataComponentType.class);
+    ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+    itemInMainHand.resetData(component);
+
+    context.getSource().getSender().sendMessage("Reset " + component.key());
+    return Command.SINGLE_SUCCESS;
   }
 
 }
