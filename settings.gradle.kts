@@ -7,6 +7,7 @@ val plugins = listOf(
   "FortuneShears",
   "FreeCart",
   "HorseHusbandry",
+  "Meta",
   "RepairCostRemover",
   "WitherFacts",
 )
