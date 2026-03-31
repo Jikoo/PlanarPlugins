@@ -124,14 +124,14 @@ public class DoubleDoors extends JavaPlugin implements Listener {
       return;
     }
 
-    if (leftDoor.getHinge() != Door.Hinge.LEFT) {
-      leftDoor.setHinge(Door.Hinge.LEFT);
-      leftBlock.setBlockData(leftDoor);
-    }
+    correctHinge(leftDoor, leftBlock, Door.Hinge.LEFT);
+    correctHinge(rightDoor, rightBlock, Door.Hinge.RIGHT);
+  }
 
-    if (rightDoor.getHinge() != Door.Hinge.RIGHT) {
-      rightDoor.setHinge(Door.Hinge.RIGHT);
-      rightBlock.setBlockData(rightDoor);
+  private void correctHinge(Door door, Block block, Door.Hinge hinge) {
+    if (door.getHinge() != hinge) {
+      door.setHinge(hinge);
+      block.setBlockData(door);
     }
   }
 
