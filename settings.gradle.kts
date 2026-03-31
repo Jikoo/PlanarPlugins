@@ -4,6 +4,7 @@ val plugins = listOf(
   "BottleExperience",
   "ColorSignText",
   "Coords",
+  "DoubleDoors",
   "FortuneShears",
   "FreeCart",
   "HorseHusbandry",
