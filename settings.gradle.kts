@@ -11,6 +11,7 @@ val plugins = listOf(
   "Meta",
   "NoCommandPrefix",
   "RepairCostRemover",
+  "TestSigns",
   "WitherFacts",
 )
 
