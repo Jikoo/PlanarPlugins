@@ -1,0 +1,20 @@
+name: "$name"
+main: "com.github.jikoo.planarplugins.$name"
+author: "Jikoo"
+version: "$version"
+api-version: "$apiVersion"
+folia-supported: true
+
+permissions:
+  planarplugins.signs.minimessage.raw:
+    default: op
+  planarplugins.signs.minimessage.filtered:
+    default: true
+  planarplugins.signs.ampersand:
+    default: true
+  planarplugins.command.sign:
+    default: true
+    children:
+      planarplugins.command.sign.auto: true
+      planarplugins.command.sign.edit: true
+      planarplugins.command.sign.clipboard: true
