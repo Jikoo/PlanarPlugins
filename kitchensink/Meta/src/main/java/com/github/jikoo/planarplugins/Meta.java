@@ -3,7 +3,6 @@ package com.github.jikoo.planarplugins;
 import com.github.jikoo.planarplugins.meta.Book;
 import com.github.jikoo.planarplugins.meta.Head;
 import com.github.jikoo.planarplugins.meta.Lore;
-import com.github.jikoo.planarplugins.meta.arguments.DataComponentTypeArgument;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,9 +10,11 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public class Meta extends JavaPlugin {
             .then(Commands.argument("name", StringArgumentType.greedyString())
                 .executes(this::name)))
         .then(Commands.literal("reset")
-            .then(Commands.argument("type", new DataComponentTypeArgument())
+            .then(Commands.argument("type", ArgumentTypes.resource(RegistryKey.DATA_COMPONENT_TYPE))
                 .executes(this::resetSingle))
             .executes(this::reset))
         .requires(stack -> stack.getSender().hasPermission("planarplugins.command.meta"))
